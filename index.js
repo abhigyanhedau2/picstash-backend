@@ -29,6 +29,13 @@ app.use(function (req, res, next) {
     next();
 });
 
+app.get('/', (req, res) => {
+    return res.json({
+        status: 'success',
+        message: 'Server returned success'
+    });
+});
+
 app.use('/api/v1/users/', userRouter);
 app.use('/api/v1/posts/', postRouter);
 
