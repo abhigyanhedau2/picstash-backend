@@ -68,10 +68,21 @@ const getAllPosts = catchAsync(async (req, res, next) => {
 
     const posts = await Post.find();
 
+    const allPosts = [];
+
+    for (const eachPost of posts) {
+        const imageURL = await getFromS3(eachPost.imageKey);
+        let newPost = {
+            ...eachPost._doc,
+        };
+        newPost.imageURL = imageURL;
+        allPosts.push(newPost);
+    }
+
     return res.status(200).json({
         status: 'success',
-        results: posts.length,
-        posts
+        results: allPosts.length,
+        posts: allPosts
     });
 
 });
@@ -105,10 +116,13 @@ const createPost = catchAsync(async (req, res, next) => {
 
     await User.findByIdAndUpdate(userId, { posts: updatedPosts });
 
+    const imageURL = await getFromS3(newPost.imageKey);
+
     return res.status(201).json({
         status: 'success',
         message: 'Post was successfully created',
-        post: newPost
+        post: newPost,
+        imageURL
     });
 });
 
@@ -147,10 +161,13 @@ const updatePost = catchAsync(async (req, res, next) => {
 
     const updatedPost = await Post.findByIdAndUpdate(postId, { imageKey: newImageKey, caption: stringedCaption }, { new: true });
 
+    const imageURL = await getFromS3(updatedPost.imageKey);
+
     return res.status(200).json({
         status: 'success',
         message: 'Post was successfully updated',
-        post: updatedPost
+        post: updatedPost,
+        imageURL
     });
 
 });
