@@ -198,7 +198,8 @@ const deletePost = catchAsync(async (req, res, next) => {
 
     await Post.findByIdAndDelete(postId);
 
-    const updatedPosts = user.posts.filter(userPostId => userPostId !== postId);
+    let updatedPosts = user.posts;
+    updatedPosts = updatedPosts.filter(userPostId => userPostId.toString() !== postId);
 
     await User.findByIdAndUpdate(userId, { posts: updatedPosts });
 
